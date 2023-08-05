@@ -29,4 +29,13 @@ export interface PostDB {
     updated_at: string
 }
 
+export interface CreatorDB {
+    id: string,
+    name: string
+}
+
+export interface PostUserDB extends PostDB {
+    creator: CreatorDB
+}
+
 
