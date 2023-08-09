@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express'
-import { UserDatabase } from '../database/UserDatabase'
-import { UserCreate, UserDB, UserLogin } from '../types'
-import { USER_ROLES, User } from '../models/User'
+import { UserCreate, UserLogin } from '../types'
 import { UserBusiness } from '../business/UserBusiness'
 
 export class UserController {
-    public async signup(req: Request, res: Response): Promise<void> {
+    public async create(req: Request, res: Response): Promise<void> {
         try {
 
             const input: UserCreate = {
@@ -60,7 +58,6 @@ export class UserController {
 
     public async login(req: Request, res: Response): Promise<void> {
         try {
-            const { email, password } = req.body
 
             const input: UserLogin = {
                 email: req.body.email,
@@ -86,4 +83,6 @@ export class UserController {
             }
         }
     }
+
+
 }
