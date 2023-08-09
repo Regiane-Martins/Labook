@@ -1,6 +1,6 @@
 import { PostDatabase } from "../database/PostDatabase"
 import { Post } from "../models/Post"
-import { PostDB } from "../types"
+import { PostDB, PostUpdate } from "../types"
 import { uuid } from "uuidv4"
 
 export class PostBusiness {
@@ -12,7 +12,7 @@ export class PostBusiness {
             likes: 0,
             dislikes: 0,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
         }
 
         const postDatabase = new PostDatabase()
@@ -26,7 +26,7 @@ export class PostBusiness {
         const postDatabase = new PostDatabase()
         const result = await postDatabase.findPost()
 
-        const post = result.map((post)=>{
+        const post = result.map((post) => {
             return new Post(
                 post.id,
                 post.creator_id,
@@ -38,6 +38,27 @@ export class PostBusiness {
             )
         })
 
-        return result
+        return post
+    }
+
+    public async update(input: PostUpdate) {
+        const {
+            id,
+            content
+        } = input
+
+        const postDatabase = new PostDatabase()
+        await postDatabase.updatePost(id, content)
+    }
+
+    public async delete(id: string){
+
+        const postDatabase = new PostDatabase()
+        const result = await postDatabase.findPostById(id)
+
+        if(!result){
+            throw new Error("'Id' não encontrado.")
+        }
+        await postDatabase.delete(id)
     }
 }

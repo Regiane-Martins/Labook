@@ -3,7 +3,7 @@ import { UserCreate, UserLogin } from '../types'
 import { UserBusiness } from '../business/UserBusiness'
 
 export class UserController {
-    public async signup(req: Request, res: Response): Promise<void> {
+    public async create(req: Request, res: Response): Promise<void> {
         try {
 
             const input: UserCreate = {
@@ -83,4 +83,6 @@ export class UserController {
             }
         }
     }
+
+
 }

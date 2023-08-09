@@ -1,5 +1,5 @@
 import { User } from "../models/User";
-import { PostDB, PostUserDB } from "../types";
+import { PostDB, PostUpdate, PostUserDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 
 export class PostDatabase extends BaseDatabase {
@@ -48,5 +48,13 @@ export class PostDatabase extends BaseDatabase {
     public async createPost(newPostDB: PostDB): Promise<PostDB[]> {
         const result: PostDB[] = await BaseDatabase.connection(PostDatabase.TABLE_POST).insert(newPostDB)
         return result
+    }
+
+    public async updatePost(id: string, content: string): Promise<void> {
+        await BaseDatabase.connection(PostDatabase.TABLE_POST).update({content}).where({ id })
+    }
+    
+    public async delete(id: string): Promise<void>{
+        await BaseDatabase.connection(PostDatabase.TABLE_POST).del().where({id})
     }
 }

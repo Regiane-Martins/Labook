@@ -14,7 +14,7 @@ app.listen(3003, () => {
 
 const userController = new UserController()
 
-app.post('/users/signup', userController.signup)
+app.post('/users/signup', userController.create)
 app.get('/users', userController.getAllUsers)
 app.post('/users/login', userController.login)
 
@@ -22,3 +22,5 @@ const postController = new PostController()
 
 app.post('/posts', postController.create)
 app.get('/posts', postController.getAll)
+app.put('/posts/:id', postController.update)
+app.delete('/posts/:id', postController.delete)
