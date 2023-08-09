@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { PostBusiness } from '../business/PostBusiness'
 import { PostDB, PostUpdate } from '../types'
+import { BaseError } from '../errors/BaseError'
+import { BadRequestError } from '../errors/BadRequestError'
 
 export class PostController {
     public async create(req: Request, res: Response) {
@@ -8,7 +10,7 @@ export class PostController {
 
         try {
             if (typeof content !== 'string') {
-                throw new Error("content must be a string!")
+                throw new BadRequestError("content must be a string!")
             }
 
             const postBusiness = new PostBusiness()
@@ -17,16 +19,10 @@ export class PostController {
 
             res.status(201).send({ message: "created" })
         } catch (error) {
-            console.log(error)
-
-            if (req.statusCode === 200) {
-                res.status(500)
-            }
-
-            if (error instanceof Error) {
-                res.send(error.message)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
             } else {
-                res.send("Erro inesperado")
+                res.status(500).send("Erro inesperado")
             }
         }
     }
@@ -38,16 +34,10 @@ export class PostController {
 
             res.status(200).send(result)
         } catch (error) {
-            console.log(error)
-
-            if (req.statusCode === 200) {
-                res.status(500)
-            }
-
-            if (error instanceof Error) {
-                res.send(error.message)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
             } else {
-                res.send("Erro inesperado")
+                res.status(500).send("Erro inesperado")
             }
         }
     }
@@ -65,16 +55,10 @@ export class PostController {
             
             res.status(200).send({message: "Updated"})
         } catch (error) {
-            console.log(error)
-
-            if (req.statusCode === 200) {
-                res.status(500)
-            }
-
-            if (error instanceof Error) {
-                res.send(error.message)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
             } else {
-                res.send("Erro inesperado")
+                res.status(500).send("Erro inesperado")
             }
         }
     }
@@ -89,16 +73,10 @@ export class PostController {
             res.status(200).send({message: "Post deletado."})
             
         } catch (error) {
-            console.log(error)
-
-            if (req.statusCode === 200) {
-                res.status(500)
-            }
-
-            if (error instanceof Error) {
-                res.send(error.message)
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
             } else {
-                res.send("Erro inesperado")
+                res.status(500).send("Erro inesperado")
             }
         }
     }
