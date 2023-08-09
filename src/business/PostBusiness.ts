@@ -1,4 +1,5 @@
 import { PostDatabase } from "../database/PostDatabase"
+import { BadRequestError } from "../errors/BadRequestError"
 import { Post } from "../models/Post"
 import { PostDB, PostUpdate } from "../types"
 import { uuid } from "uuidv4"
@@ -57,7 +58,7 @@ export class PostBusiness {
         const result = await postDatabase.findPostById(id)
 
         if(!result){
-            throw new Error("'Id' não encontrado.")
+            throw new BadRequestError("'Id' não encontrado.")
         }
         await postDatabase.delete(id)
     }
