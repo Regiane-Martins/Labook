@@ -1,4 +1,5 @@
 import { PostDatabase } from "../database/PostDatabase"
+import { PostUpdateInputDTO } from "../dtos/postUpdate.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { Post } from "../models/Post"
 import { PostDB, PostUpdate } from "../types"
@@ -20,7 +21,11 @@ export class PostBusiness {
 
         await postDatabase.createPost(post)
 
-        return true
+        const output= {
+            message: "CREATED",
+          }
+
+        return output
     }
 
     public async getAll() {
@@ -42,7 +47,7 @@ export class PostBusiness {
         return post
     }
 
-    public async update(input: PostUpdate) {
+    public async update(input: PostUpdateInputDTO) {
         const {
             id,
             content
