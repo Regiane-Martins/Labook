@@ -17,19 +17,9 @@ export interface PostDB {
     updated_at: string,
 }
 
-export interface PostUpdate{
-    id: string,
-    content: string,
-}
-
-
-export interface CreatorDB {
-    id: string,
-    name: string
-}
-
 export interface PostUserDB extends PostDB {
-    creator: CreatorDB
+    userId: string,
+    userName: string
 }
 
 

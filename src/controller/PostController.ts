@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
 import { PostBusiness } from '../business/PostBusiness'
-import { PostDB, PostUpdate } from '../types'
 import { BaseError } from '../errors/BaseError'
 import { BadRequestError } from '../errors/BadRequestError'
 import { postUpdateSchema } from '../dtos/postUpdate.dto'
