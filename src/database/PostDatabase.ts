@@ -1,5 +1,5 @@
 import { User } from "../models/User";
-import { PostDB, PostUpdate, PostUserDB } from "../types";
+import { PostDB, PostUserDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 
 export class PostDatabase extends BaseDatabase {

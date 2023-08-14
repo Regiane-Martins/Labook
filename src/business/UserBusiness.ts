@@ -1,28 +1,15 @@
 import { UserDatabase } from "../database/UserDatabase"
+import { userCreateInputDTO, userCreateOutputDTO } from "../dtos/userCreate.dto"
+import { UserLoginInputDTO, UserLoginOutputDTO } from "../dtos/userLogin.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { ConflictError } from "../errors/ConflictError"
 import { USER_ROLES, User } from "../models/User"
-import { UserCreate, UserDB, UserLogin } from "../types"
+import { UserDB} from "../types"
 
 export class UserBusiness {
-    public async create(input: UserCreate){
+    public async create(input: userCreateInputDTO): Promise<userCreateOutputDTO>{
         const {id, name, email, password} = input
 
-        if (id !== undefined) {
-            if (typeof id !== "string") {
-                throw new BadRequestError("'Id'deve ser uma string")
-            }
-            if (typeof name !== "string") {
-                throw new BadRequestError("'Name'deve ser uma string")
-            }
-            if (typeof email !== "string") {
-                throw new BadRequestError("'E-mail'deve ser uma string")
-            }
-            if (typeof password !== "string") {
-                throw new BadRequestError("'Password'deve ser uma string")
-            }
-
-        }
 
         const userDatabase = new UserDatabase()
         const userExist = await userDatabase.findUserById(id)
@@ -50,7 +37,15 @@ export class UserBusiness {
         }
 
         await userDatabase.creatUser(newUserDB)
-        const output = {message: "Usuário cadastrado com sucesso!"}
+
+        const output: userCreateOutputDTO = {
+            message: "CREATED",
+            user: {
+              id: newUser.getId(),
+              name: newUser.getName(),
+              email: newUser.getEmail()
+            }
+          }
         return output
     }
 
@@ -73,23 +68,9 @@ export class UserBusiness {
             return users
     }
 
-    public async login(input: UserLogin){
+    public async login(input: UserLoginInputDTO): Promise<UserLoginOutputDTO>{
 
         const {email, password} = input
-
-        if (typeof email !== undefined) {
-            if (typeof email !== "string") {
-                throw new BadRequestError("Email deve ser uma string.")
-            }
-
-            if (typeof password !== "string") {
-                throw new BadRequestError("Password deve ser uma string.")
-            }
-        }
-
-        if (!email || !password) {
-            throw new BadRequestError("Todos os campos são obrigatórios.")
-        }
 
         const userDatabase = new UserDatabase()
         const user = await userDatabase.findUserByEmail(email)
@@ -100,8 +81,10 @@ export class UserBusiness {
 
 
         if (password === user.password) {
-            const message = "Entrou"
-            return message
+            const output: UserLoginOutputDTO = {
+                token: "um token jwt"
+            }
+            return output
         } else {
             throw new BadRequestError("Senha incorreta")
         }

@@ -7,18 +7,6 @@ export interface UserDB {
     created_at: string
 }
 
-export interface UserCreate {
-    id: string,
-    name: string,
-    email: string,
-    password: string,
-}
-
-export interface UserLogin{
-    email: string,
-    password: string,
-}
-
 export interface PostDB {
     id: string,
     creator_id: string,
@@ -29,19 +17,9 @@ export interface PostDB {
     updated_at: string,
 }
 
-export interface PostUpdate{
-    id: string,
-    content: string,
-}
-
-
-export interface CreatorDB {
-    id: string,
-    name: string
-}
-
 export interface PostUserDB extends PostDB {
-    creator: CreatorDB
+    userId: string,
+    userName: string
 }
 
 

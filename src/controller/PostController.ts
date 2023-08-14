@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 import { PostBusiness } from '../business/PostBusiness'
-import { PostDB, PostUpdate } from '../types'
 import { BaseError } from '../errors/BaseError'
 import { BadRequestError } from '../errors/BadRequestError'
+import { postUpdateSchema } from '../dtos/postUpdate.dto'
+import { ZodError } from 'zod'
 
 export class PostController {
     public async create(req: Request, res: Response) {
@@ -19,7 +20,9 @@ export class PostController {
 
             res.status(201).send({ message: "created" })
         } catch (error) {
-            if (error instanceof BaseError) {
+            if(error instanceof ZodError){
+                res.status(400).send(error.issues)
+            }else if (error instanceof BaseError) {
                 res.status(error.statusCode).send(error.message)
             } else {
                 res.status(500).send("Erro inesperado")
@@ -34,7 +37,9 @@ export class PostController {
 
             res.status(200).send(result)
         } catch (error) {
-            if (error instanceof BaseError) {
+            if(error instanceof ZodError){
+                res.status(400).send(error.issues)
+            }else if (error instanceof BaseError) {
                 res.status(error.statusCode).send(error.message)
             } else {
                 res.status(500).send("Erro inesperado")
@@ -44,10 +49,11 @@ export class PostController {
 
     public async update(req: Request, res: Response) {
         try {
-            const input: PostUpdate = {
+            
+            const input = postUpdateSchema.parse({
                 id: req.params.id,
-                content: req.body.content as string
-            }
+                content: req.body.content
+            })
 
             const postBusiness = new PostBusiness()
             await postBusiness.update(input)
@@ -55,7 +61,9 @@ export class PostController {
             
             res.status(200).send({message: "Updated"})
         } catch (error) {
-            if (error instanceof BaseError) {
+            if(error instanceof ZodError){
+                res.status(400).send(error.issues)
+            }else if (error instanceof BaseError) {
                 res.status(error.statusCode).send(error.message)
             } else {
                 res.status(500).send("Erro inesperado")
@@ -73,7 +81,9 @@ export class PostController {
             res.status(200).send({message: "Post deletado."})
             
         } catch (error) {
-            if (error instanceof BaseError) {
+            if(error instanceof ZodError){
+                res.status(400).send(error.issues)
+            }else if (error instanceof BaseError) {
                 res.status(error.statusCode).send(error.message)
             } else {
                 res.status(500).send("Erro inesperado")
