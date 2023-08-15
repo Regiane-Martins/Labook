@@ -6,7 +6,10 @@ import { ZodError } from 'zod'
 import { userLoginSchema } from '../dtos/userLogin.dto'
 
 export class UserController {
-    public async create(req: Request, res: Response): Promise<void> {
+    constructor(
+        private userBusiness: UserBusiness
+    ){}
+    public create= async (req: Request, res: Response): Promise<void> =>{
         try {
 
             const input = userCreateSchema.parse({
@@ -15,9 +18,8 @@ export class UserController {
                 email: req.body.email,
                 password: req.body.password
             })
-
-            const userBusiness = new UserBusiness()
-            const output = await userBusiness.create(input)
+     
+            const output = await this.userBusiness.create(input)
 
             res.status(201).send(output)
 
@@ -32,15 +34,15 @@ export class UserController {
         }
     }
 
-    public async getAllUsers(req: Request, res: Response): Promise<void> {
+    public getAllUsers = async(req: Request, res: Response): Promise<void>=>{
         try {
-
-            const userBusiness = new UserBusiness()
-            const output = await userBusiness.getAllUsers()
+            const output = await this.userBusiness.getAllUsers()
 
             res.status(200).send(output)
 
         } catch (error) {
+            console.log(error);
+            
             if (error instanceof BaseError) {
                 res.status(error.statusCode).send(error.message)
             } else {
@@ -49,7 +51,7 @@ export class UserController {
         }
     }
 
-    public async login(req: Request, res: Response): Promise<void> {
+    public login= async (req: Request, res: Response): Promise<void> =>{
         try {
 
             const input = userLoginSchema.parse({
@@ -57,8 +59,8 @@ export class UserController {
                 password: req.body.password
             })
 
-            const userBusiness = new UserBusiness()
-            const output = await userBusiness.login(input)
+            
+            const output = await this.userBusiness.login(input)
 
             res.status(200).send(output)
 
