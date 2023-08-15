@@ -7,7 +7,12 @@ import { PostDB } from "../types"
 import { uuid } from "uuidv4"
 
 export class PostBusiness {
-    public async create(content: string, creatorId: string) {
+    constructor(
+        private postDatabase: PostDatabase
+    ) { }
+
+
+    public create = async (content: string, creatorId: string) => {
         const post: PostDB = {
             id: uuid(),
             content,
@@ -18,9 +23,7 @@ export class PostBusiness {
             updated_at: new Date().toISOString(),
         }
 
-        const postDatabase = new PostDatabase()
-
-        await postDatabase.createPost(post)
+        await this.postDatabase.createPost(post)
 
         const output = {
             message: "CREATED",
@@ -28,12 +31,10 @@ export class PostBusiness {
 
         return output
     }
-    public async getAll(): Promise<PostGetAllOutputDTO[]> {
-        const postDatabase = new PostDatabase()
-        const result = await postDatabase.findPost()
 
-        console.log(result);
+    public getAll = async (): Promise<PostGetAllOutputDTO[]> => {
 
+        const result = await this.postDatabase.findPost()
 
         const output: PostGetAllOutputDTO[] = result.map((item) => ({
             id: item.id,
@@ -51,24 +52,24 @@ export class PostBusiness {
         return output
     }
 
-    public async update(input: PostUpdateInputDTO) {
+    public update = async (input: PostUpdateInputDTO) => {
         const {
             id,
             content
         } = input
 
-        const postDatabase = new PostDatabase()
-        await postDatabase.updatePost(id, content)
+
+        await this.postDatabase.updatePost(id, content)
     }
 
-    public async delete(id: string) {
+    public delete = async (id: string) => {
 
-        const postDatabase = new PostDatabase()
-        const result = await postDatabase.findPostById(id)
+
+        const result = await this.postDatabase.findPostById(id)
 
         if (!result) {
             throw new BadRequestError("'Id' não encontrado.")
         }
-        await postDatabase.delete(id)
+        await this.postDatabase.delete(id)
     }
 }

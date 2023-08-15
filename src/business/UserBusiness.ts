@@ -4,15 +4,17 @@ import { UserLoginInputDTO, UserLoginOutputDTO } from "../dtos/userLogin.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { ConflictError } from "../errors/ConflictError"
 import { USER_ROLES, User } from "../models/User"
-import { UserDB} from "../types"
+import { UserDB } from "../types"
 
 export class UserBusiness {
-    public async create(input: userCreateInputDTO): Promise<userCreateOutputDTO>{
-        const {id, name, email, password} = input
+    constructor(
+        private userDatabase: UserDatabase
+    ) { }
 
+    public create = async (input: userCreateInputDTO): Promise<userCreateOutputDTO> => {
+        const { id, name, email, password } = input
 
-        const userDatabase = new UserDatabase()
-        const userExist = await userDatabase.findUserById(id)
+        const userExist = await this.userDatabase.findUserById(id)
 
         if (userExist) {
             throw new ConflictError("'Id'já existente.")
@@ -36,44 +38,43 @@ export class UserBusiness {
             created_at: newUser.getCreatedAt()
         }
 
-        await userDatabase.creatUser(newUserDB)
+        await this.userDatabase.creatUser(newUserDB)
 
         const output: userCreateOutputDTO = {
             message: "CREATED",
             user: {
-              id: newUser.getId(),
-              name: newUser.getName(),
-              email: newUser.getEmail()
+                id: newUser.getId(),
+                name: newUser.getName(),
+                email: newUser.getEmail()
             }
-          }
+        }
         return output
     }
 
-    public async getAllUsers(){
-        const userDatabase = new UserDatabase()
-            const result = await userDatabase.findUser()
+    public getAllUsers = async()=>{
+        const result = await this.userDatabase.findUser()
 
-            const users = result.map((user) => {
-                return new User(
-                    user.id,
-                    user.name,
-                    user.email,
-                    user.password,
-                    USER_ROLES.NORMAL,
-                    user.created_at
-                )
+        const users = result.map((user) => {
+            return new User(
+                user.id,
+                user.name,
+                user.email,
+                user.password,
+                USER_ROLES.NORMAL,
+                user.created_at
+            )
 
-            })
+        })
 
-            return users
+        return users 
     }
 
-    public async login(input: UserLoginInputDTO): Promise<UserLoginOutputDTO>{
+    public login= async (input: UserLoginInputDTO): Promise<UserLoginOutputDTO> =>{
 
-        const {email, password} = input
+        const { email, password } = input
 
-        const userDatabase = new UserDatabase()
-        const user = await userDatabase.findUserByEmail(email)
+
+        const user = await this.userDatabase.findUserByEmail(email)
 
         if (!user) {
             throw new ConflictError("Email de usuário não encontrado.")
