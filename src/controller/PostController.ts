@@ -4,24 +4,24 @@ import { BaseError } from '../errors/BaseError'
 import { BadRequestError } from '../errors/BadRequestError'
 import { postUpdateSchema } from '../dtos/postUpdate.dto'
 import { ZodError } from 'zod'
+import { postCreateSchema } from '../dtos/postCreate.dto'
 
 export class PostController {
     constructor(
         private postBusiness: PostBusiness
     ) { }
     public create = async (req: Request, res: Response) => {
-        const { content } = req.body
 
         try {
-            if (typeof content !== 'string') {
-                throw new BadRequestError("content must be a string!")
-            }
 
+            const input = postCreateSchema.parse({
+                content: req.body.content,
+                token: req.headers.authorization
+            })
+            
+            await this.postBusiness.create(input)
 
-
-            await this.postBusiness.create(content, 'u001')
-
-            res.status(201).send({ message: "created" })
+            res.sendStatus(201)
         } catch (error) {
             if (error instanceof ZodError) {
                 res.status(400).send(error.issues)

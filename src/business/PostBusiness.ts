@@ -1,35 +1,44 @@
 import { PostDatabase } from "../database/PostDatabase"
+import { PostCreateInputDTO} from "../dtos/postCreate.dto"
 import { PostGetAllOutputDTO } from "../dtos/postGetAll.dto"
 import { PostUpdateInputDTO } from "../dtos/postUpdate.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { Post } from "../models/Post"
+import { IdGenerator } from "../service/IdGenerator"
+import { TokenManager } from "../service/TokenManager"
 import { PostDB } from "../types"
 import { uuid } from "uuidv4"
 
 export class PostBusiness {
     constructor(
-        private postDatabase: PostDatabase
+        private postDatabase: PostDatabase,
+        private idGenerator: IdGenerator,
+        private tokenManager: TokenManager
     ) { }
 
 
-    public create = async (content: string, creatorId: string) => {
-        const post: PostDB = {
-            id: uuid(),
+    public create = async (input: PostCreateInputDTO): Promise<void>  => {
+        const id = this.idGenerator.generate()
+
+        const {content, token} = input
+
+        const result = this.tokenManager.getPayload(token)
+
+        if(!result){
+            throw new Error("token invalido.")
+        }
+
+        const postCreateDB: PostDB = {
+            id,
             content,
-            creator_id: creatorId,
+            creator_id: result.id,
             likes: 0,
             dislikes: 0,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
         }
 
-        await this.postDatabase.createPost(post)
-
-        const output = {
-            message: "CREATED",
-        }
-
-        return output
+        await this.postDatabase.createPost(postCreateDB)
     }
 
     public getAll = async (): Promise<PostGetAllOutputDTO[]> => {
@@ -53,6 +62,7 @@ export class PostBusiness {
     }
 
     public update = async (input: PostUpdateInputDTO) => {
+
         const {
             id,
             content

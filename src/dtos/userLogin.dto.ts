@@ -6,7 +6,7 @@ export interface UserLoginInputDTO {
 }
 
 export interface UserLoginOutputDTO {
-    token: "um token jwt"
+    token: string
 }
 
 export const userLoginSchema = z.object({
