@@ -1,7 +1,6 @@
 import { z } from "zod"
 
 export interface userCreateInputDTO {
-    id: string,
     name: string,
     email: string,
     password: string
@@ -9,16 +8,11 @@ export interface userCreateInputDTO {
 
 export interface userCreateOutputDTO {
     message: string,
-    user: {
-        id: string,
-        name: string,
-        email: string
-    }
+    token: string
 }
 
 
 export const userCreateSchema = z.object({
-    id: z.string(),
     name: z.string({
         invalid_type_error: "'name' deve ser do tipo string"
     }).min(2),

@@ -2,7 +2,8 @@ import { z } from "zod"
 
 export interface PostUpdateInputDTO{
     id: string,
-    content: string
+    content: string,
+    token: string
 }
 
 export const postUpdateSchema = z.object({
@@ -12,6 +13,7 @@ export const postUpdateSchema = z.object({
     }),
     content: z.string({
         invalid_type_error: "'content' deve ser do tipo string"
-    })
+    }),
+    token: z.string().min(2)
 }).transform(data => data as PostUpdateInputDTO)
 

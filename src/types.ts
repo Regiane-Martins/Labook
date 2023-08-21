@@ -1,9 +1,11 @@
+import { USER_ROLES } from "./models/User"
+
 export interface UserDB {
     id: string,
     name: string,
     email: string,
     password: string,
-    role: string,
+    role: USER_ROLES,
     created_at: string
 }
 
@@ -21,5 +23,6 @@ export interface PostUserDB extends PostDB {
     userId: string,
     userName: string
 }
+
 
 

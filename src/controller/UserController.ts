@@ -13,7 +13,6 @@ export class UserController {
         try {
 
             const input = userCreateSchema.parse({
-                id: req.body.id,
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password

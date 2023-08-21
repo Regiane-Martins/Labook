@@ -1,5 +1,4 @@
 export interface PostGetAllOutputDTO {
-    id: string,
     content: string,
     likes: number,
     dislikes: number,

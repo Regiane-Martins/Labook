@@ -4,21 +4,21 @@ import { UserLoginInputDTO, UserLoginOutputDTO } from "../dtos/userLogin.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { ConflictError } from "../errors/ConflictError"
 import { USER_ROLES, User } from "../models/User"
+import { IdGenerator } from "../service/IdGenerator"
+import { TokenManager, TokenPayload } from "../service/TokenManager"
 import { UserDB } from "../types"
 
 export class UserBusiness {
     constructor(
-        private userDatabase: UserDatabase
+        private userDatabase: UserDatabase,
+        private idGenerator: IdGenerator,
+        private tokenManager: TokenManager
     ) { }
 
     public create = async (input: userCreateInputDTO): Promise<userCreateOutputDTO> => {
-        const { id, name, email, password } = input
+        const { name, email, password } = input
 
-        const userExist = await this.userDatabase.findUserById(id)
-
-        if (userExist) {
-            throw new ConflictError("'Id'já existente.")
-        }
+        const id = this.idGenerator.generate()
 
         const newUser = new User(
             id,
@@ -40,18 +40,22 @@ export class UserBusiness {
 
         await this.userDatabase.creatUser(newUserDB)
 
+        const tokenPayload: TokenPayload = {
+            id: newUser.getId(),
+            name: newUser.getName(),
+            role: newUser.getRole()
+        }
+
+        const token = this.tokenManager.createToken(tokenPayload)
+
         const output: userCreateOutputDTO = {
             message: "CREATED",
-            user: {
-                id: newUser.getId(),
-                name: newUser.getName(),
-                email: newUser.getEmail()
-            }
+            token: token
         }
         return output
     }
 
-    public getAllUsers = async()=>{
+    public getAllUsers = async () => {
         const result = await this.userDatabase.findUser()
 
         const users = result.map((user) => {
@@ -66,10 +70,10 @@ export class UserBusiness {
 
         })
 
-        return users 
+        return users
     }
 
-    public login= async (input: UserLoginInputDTO): Promise<UserLoginOutputDTO> =>{
+    public login = async (input: UserLoginInputDTO): Promise<UserLoginOutputDTO> => {
 
         const { email, password } = input
 
@@ -81,13 +85,23 @@ export class UserBusiness {
         }
 
 
-        if (password === user.password) {
-            const output: UserLoginOutputDTO = {
-                token: "um token jwt"
-            }
-            return output
-        } else {
-            throw new BadRequestError("Senha incorreta")
+        if (password !== user.password) {
+            throw new ConflictError("Senha incorreta.")
         }
+
+        const tokenPayload: TokenPayload = {
+            id: user.id,
+            name: user.name,
+            role: user.role
+        }
+
+        const token = this.tokenManager.createToken(tokenPayload)
+
+        const output: UserLoginOutputDTO = {
+            token: token
+        }
+
+        return output
+
     }
 }

@@ -29,7 +29,7 @@ export class User {
         return this.password
     }
 
-    getRole(): string {
+    getRole(): USER_ROLES {
         return this.role
     }
 

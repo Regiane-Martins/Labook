@@ -4,24 +4,26 @@ import { BaseError } from '../errors/BaseError'
 import { BadRequestError } from '../errors/BadRequestError'
 import { postUpdateSchema } from '../dtos/postUpdate.dto'
 import { ZodError } from 'zod'
+import { postCreateSchema } from '../dtos/postCreate.dto'
+import { tokenCheckSchema } from '../dtos/tokenCheck.dto'
+import { postDeleteSchema } from '../dtos/postDelete.dto'
 
 export class PostController {
     constructor(
         private postBusiness: PostBusiness
     ) { }
     public create = async (req: Request, res: Response) => {
-        const { content } = req.body
 
         try {
-            if (typeof content !== 'string') {
-                throw new BadRequestError("content must be a string!")
-            }
 
+            const input = postCreateSchema.parse({
+                content: req.body.content,
+                token: req.headers.authorization
+            })
+            
+            await this.postBusiness.create(input)
 
-
-            await this.postBusiness.create(content, 'u001')
-
-            res.status(201).send({ message: "created" })
+            res.sendStatus(201)
         } catch (error) {
             if (error instanceof ZodError) {
                 res.status(400).send(error.issues)
@@ -36,7 +38,11 @@ export class PostController {
     public getAll = async (req: Request, res: Response) => {
         try {
 
-            const result = await this.postBusiness.getAll()
+            const input = tokenCheckSchema.parse({
+                token: req.headers.authorization
+            })
+
+            const result = await this.postBusiness.getAll(input)
 
             res.status(200).send(result)
         } catch (error) {
@@ -55,7 +61,8 @@ export class PostController {
 
             const input = postUpdateSchema.parse({
                 id: req.params.id,
-                content: req.body.content
+                content: req.body.content,
+                token: req.headers.authorization
             })
 
 
@@ -76,13 +83,18 @@ export class PostController {
 
     public delete = async (req: Request, res: Response) => {
         try {
-            const { id } = req.params
+            const input = postDeleteSchema.parse({
+                id:req.params.id,
+                token: req.headers.authorization
+            })
 
-            await this.postBusiness.delete(id)
+            await this.postBusiness.delete(input)
 
             res.status(200).send({ message: "Post deletado." })
 
         } catch (error) {
+            console.log(error);
+            
             if (error instanceof ZodError) {
                 res.status(400).send(error.issues)
             } else if (error instanceof BaseError) {
