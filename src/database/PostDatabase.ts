@@ -57,4 +57,9 @@ export class PostDatabase extends BaseDatabase {
     public async delete(id: string): Promise<void>{
         await BaseDatabase.connection(PostDatabase.TABLE_POST).del().where({id})
     }
+
+    public async findLikeDislike(id: string, creator_id: string): Promise<void>{
+       const [result]=  await BaseDatabase.connection("likes_dislikes").where({post_id: id}).andWhere({user_id: creator_id})
+       console.log(result)
+    }
 }

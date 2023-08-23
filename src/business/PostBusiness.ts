@@ -2,6 +2,7 @@ import { PostDatabase } from "../database/PostDatabase"
 import { PostCreateInputDTO } from "../dtos/postCreate.dto"
 import { PostDeleteInputDTO } from "../dtos/postDelete.dto"
 import { PostGetAllOutputDTO } from "../dtos/postGetAll.dto"
+import { PostLikeDislikeInputDTO } from "../dtos/postLikeDislike.dto"
 import { PostUpdateInputDTO } from "../dtos/postUpdate.dto"
 import { TokenCheckInputDTO } from "../dtos/tokenCheck.dto"
 import { BadRequestError } from "../errors/BadRequestError"
@@ -118,5 +119,22 @@ export class PostBusiness {
             throw new BadRequestError("acesso negado")
         }
 
+    }
+
+    public likeDislike = async(input: PostLikeDislikeInputDTO) =>{
+        const {id, like, token} = input
+        
+        const payload = this.tokenManager.getPayload(token)
+        
+        if (payload === null) {
+            throw new BadRequestError("token invalido.")
+        }
+
+        const result = await this.postDatabase.findPostById(id)
+        console.log(result);
+        
+        if(payload.id === result?.creator_id){
+            throw new BadRequestError("você não pode cutir seu proprio post.")
+        }
     }
 }
