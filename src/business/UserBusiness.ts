@@ -5,6 +5,7 @@ import { UserLoginInputDTO, UserLoginOutputDTO } from "../dtos/userLogin.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { ConflictError } from "../errors/ConflictError"
 import { USER_ROLES, User } from "../models/User"
+import { HashManager } from "../service/HashManager"
 import { IdGenerator } from "../service/IdGenerator"
 import { TokenManager, TokenPayload } from "../service/TokenManager"
 import { UserDB } from "../types"
@@ -13,7 +14,8 @@ export class UserBusiness {
     constructor(
         private userDatabase: UserDatabase,
         private idGenerator: IdGenerator,
-        private tokenManager: TokenManager
+        private tokenManager: TokenManager,
+        private hashManager: HashManager
     ) { }
 
     public create = async (input: userCreateInputDTO): Promise<userCreateOutputDTO> => {
@@ -21,11 +23,13 @@ export class UserBusiness {
 
         const id = this.idGenerator.generate()
 
+        const hashedPassword = await this.hashManager.hash(password)       
+
         const newUser = new User(
             id,
             name,
             email,
-            password,
+            hashedPassword,
             USER_ROLES.NORMAL,
             new Date().toISOString()
         )
@@ -81,8 +85,9 @@ export class UserBusiness {
             throw new ConflictError("Email de usuário não encontrado.")
         }
 
+        const isPasswordValid = await this.hashManager.compare(password, user.password)
 
-        if (password !== user.password) {
+        if (!isPasswordValid) {
             throw new ConflictError("Senha incorreta.")
         }
 
