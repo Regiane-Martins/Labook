@@ -112,8 +112,10 @@ export class PostBusiness {
             throw new BadRequestError("'Id' não encontrado.")
         }
 
-        if (payload.id === result.id || payload.role === USER_ROLES.ADMIN) {
+        if (payload.id === result.creator_id || payload.role === USER_ROLES.ADMIN) {
             await this.postDatabase.delete(id)
+        }else{
+            throw new BadRequestError("acesso negado")
         }
 
     }
