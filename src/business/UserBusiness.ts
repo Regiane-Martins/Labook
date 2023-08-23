@@ -1,5 +1,6 @@
 import { UserDatabase } from "../database/UserDatabase"
 import { userCreateInputDTO, userCreateOutputDTO } from "../dtos/userCreate.dto"
+import { UserGetAllOutputDTO } from "../dtos/userGetAll.dto"
 import { UserLoginInputDTO, UserLoginOutputDTO } from "../dtos/userLogin.dto"
 import { BadRequestError } from "../errors/BadRequestError"
 import { ConflictError } from "../errors/ConflictError"
@@ -55,22 +56,18 @@ export class UserBusiness {
         return output
     }
 
-    public getAllUsers = async () => {
+    public getAllUsers = async (): Promise<UserGetAllOutputDTO[]> => {
         const result = await this.userDatabase.findUser()
 
-        const users = result.map((user) => {
-            return new User(
-                user.id,
-                user.name,
-                user.email,
-                user.password,
-                USER_ROLES.NORMAL,
-                user.created_at
-            )
+        const output: UserGetAllOutputDTO[] = result.map((user)=>({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createAt: user.created_at       
+        }))
 
-        })
-
-        return users
+        return output
     }
 
     public login = async (input: UserLoginInputDTO): Promise<UserLoginOutputDTO> => {
