@@ -1,4 +1,4 @@
--- Active: 1691260339733@@127.0.0.1@3306
+-- Active: 1692753831401@@127.0.0.1@1433
 
 CREATE TABLE
     users (
@@ -63,8 +63,11 @@ VALUES (
 CREATE TABLE
     likes_dislikes(
         user_id TEXT NOT NULL,
-        post_id TExt NOT NULL,
+        post_id TEXT NOT NULL,
         like INTEGER,
+        PRIMARY KEY (user_id, post_id)
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (post_id) REFERENCES post(id)
     );
+
+SELECT * FROM likes_dislikes;

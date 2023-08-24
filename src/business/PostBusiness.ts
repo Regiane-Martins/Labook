@@ -9,7 +9,7 @@ import { BadRequestError } from "../errors/BadRequestError"
 import { USER_ROLES } from "../models/User"
 import { IdGenerator } from "../service/IdGenerator"
 import { TokenManager } from "../service/TokenManager"
-import { PostDB } from "../types"
+import { LikeDislikeDB, PostDB } from "../types"
 
 
 export class PostBusiness {
@@ -122,19 +122,61 @@ export class PostBusiness {
     }
 
     public likeDislike = async(input: PostLikeDislikeInputDTO) =>{
-        const {id, like, token} = input
+        const {id: postId, like, token} = input
+
+        const isLiked = Number(like)
         
         const payload = this.tokenManager.getPayload(token)
         
         if (payload === null) {
             throw new BadRequestError("token invalido.")
         }
+        const userId = payload.id
 
-        const result = await this.postDatabase.findPostById(id)
-        console.log(result);
+        const result = await this.postDatabase.findPostById(postId)
+
+        if(typeof result === 'undefined'){
+            throw new BadRequestError("Post não localizado.")
+        }
         
-        if(payload.id === result?.creator_id){
+        if(userId === result?.creator_id){
             throw new BadRequestError("você não pode cutir seu proprio post.")
         }
+    
+        const likeDislikeDB: LikeDislikeDB = {
+            post_id: postId,
+            user_id: userId,
+            like: isLiked
+        }
+
+        const likeExist = await this.postDatabase.findLikeDislike(postId, userId)
+
+        if(!likeExist){
+            await this.postDatabase.createLikeDislike(likeDislikeDB)
+            if(isLiked === 1){
+                await this.postDatabase.incrementLike(postId)
+            }else{
+                await this.postDatabase.incrementDislike(postId)
+            }
+        }else{
+            if(isLiked !== likeExist.like){
+                await this.postDatabase.createLikeDislike(likeDislikeDB)
+                if(isLiked === 1){
+                    await this.postDatabase.revertDislikeToLike(postId)
+                }else{
+                    await this.postDatabase.revertLikeToDislike(postId)
+                }
+            }else{
+                await this.postDatabase.deleteLikeDislike(postId, userId)// se clicar duas vezes deleta
+
+                if(isLiked === 1){
+                    await this.postDatabase.decrementLike(postId)
+                }else{
+                    await this.postDatabase.decrementDislike(postId) 
+                }
+            }
+            
+        }
+        
     }
 }
