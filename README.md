@@ -37,10 +37,92 @@
 # Exemplo de Requisições
 ### Requisições de usuários
 
-🚧 em construcao 🚧
+* POST / users/signup: Cadastro de usuários.
+
+```json
+{
+  "message": "CREATED",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFjNDgxMzY1LWMzZWEtNDcyZS04NjA5LWY4YzBkMmI1OWE1YiIsIm5hbWUiOiJNaWd1ZWwiLCJyb2xlIjoiTk9STUFMIiwiaWF0IjoxNjkyNzI4MDQ2LCJleHAiOjE2OTMzMzI4NDZ9.gRYSgaAh_46uDCDDdZ7YFBzPD8torSdWFbmsm1L9ekk"
+}
+
+```
+
+* POST/ users/login : Login da conta, retornando token.
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImE4ZTI4NDY3LTI1YjYtNDc4YS04NzQ5LTY3YmZhNTY2Mzc0OCIsIm5hbWUiOiJNaWd1ZWwiLCJyb2xlIjoiTk9STUFMIiwiaWF0IjoxNjkyNzI4MzY4LCJleHAiOjE2OTMzMzMxNjh9.ZikGVzfPr9xqJDiDKRKttpiCkVl7Xn17QIHb4f4omkM"
+}
+```
+
+* GET /users: Retorna todos os usuário cadastrados.
+```json
+[
+  {
+    "id": "8a7019e2-c395-47a0-9e05-f6aa2421ece3",
+    "name": "Regiane",
+    "email": "regiane@email.com",
+    "role": "NORMAL",
+    "createAt": "2023-08-22T17:27:43.262Z"
+  },
+  {
+    "id": "a8e28467-25b6-478a-8749-67bfa5663748",
+    "name": "Miguel",
+    "email": "miguel@email.com",
+    "role": "NORMAL",
+    "createAt": "2023-08-22T17:28:31.588Z"
+  }
+]
+```
+### Requisições de posts
+
+* POST /posts: Criação de posts
+```json
+Created
+
+``` 
+* GET /posts: Buscar de todos os posts.
+```json
+[
+  {
+    "id": "c915b003-c428-4e22-ad95-7fadfe96cf4e",
+    "content": "Deus é bom",
+    "likes": 0,
+    "dislikes": 0,
+    "created_at": "2023-08-22T17:29:51.636Z",
+    "updated_at": "2023-08-22T17:29:51.636Z",
+    "creator": {
+      "id": "8a7019e2-c395-47a0-9e05-f6aa2421ece3",
+      "name": "Regiane"
+    }
+  }
+]
+
+```
+
+* PUT /posts/:id : Edição do post por Id.
+```json
+{
+  "message": "Updated"
+}
+
+```
+
+* DELETE /posts/:id: Deleta posts por Id.
+```json
+{
+  "message": "Post deletado."
+}
+
+```
+
+* PUT /posts/:id/like: Like e Dislike em post via Id e token.
+```json
+OK
+
+```
 
 # Documentação do Postman
-🚧 em construcao 🚧
+https://documenter.getpostman.com/view/26567220/2s9Y5YS2c7
 
 # 🛠 Tecnologias
 
@@ -55,6 +137,7 @@ Na construção do projeto foram usadas as seguintes ferramentas:
 - [Zod](https://zod.dev/)
 - [Dotenv](https://www.dotenv.org/docs/)
 - [JWT](https://jwt.io/introduction/)
+- [Bcrypt](https://www.npmjs.com/package/bcrypt)
 
 # Acesso ao Projeto
 
@@ -62,7 +145,7 @@ Na construção do projeto foram usadas as seguintes ferramentas:
 
 Antes de começar, você vai precisar ter instalado em sua máquina as seguintes ferramentas:
 [Git](https://git-scm.com), [Node.js](https://nodejs.org/en/). 
-Além disto é bom ter um editor para trabalhar com o código como [VSCode](https://code.visualstudio.com/)
+Além disto é bom ter um editor para trabalhar com o código como [VSCode](https://code.visualstudio.com/).
 
 ### 🎲 Rodando o Back End (servidor)
 
